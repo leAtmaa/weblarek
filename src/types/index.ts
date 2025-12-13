@@ -6,7 +6,7 @@ export interface IApi {
 }
 
 //Тип оплаты товара
-export type TPayment = 'card' | 'cash';
+export type TPayment = "online" | "cash" | null;
 
 //Интерфейс товара
 export interface IProduct {
@@ -20,10 +20,25 @@ export interface IProduct {
 
 //Интерфейс покупателя
 export interface IBuyer {
+  payment: TPayment| undefined;
+  email: string;
+  phone: string;
+  address: string;
+}
+
+//Bнтерфейс описывающий данные о заказе
+export interface TOrder { 
   payment: TPayment;
   email: string;
   phone: string;
   address: string;
+  total: number;
+  items: string[];
+}
+
+//Интерфейс галлереи
+export interface IGallery {
+  items: HTMLElement[];
 }
 
 // Ответ API со списком товаров
@@ -43,3 +58,92 @@ export interface IOrderResponse {
     id: string;
     total: number;
 }
+
+export interface ICatalogData {
+  total: number;
+  items: IProduct[];
+}
+
+// Интерфейс счетчика корзины
+export interface IHeader {
+  counter: number;
+}
+
+// Интерфейс товара в корзине
+export interface IBasketData {
+  items: HTMLElement[];
+  total: number;
+}
+
+// Интерфейс суммы списания
+export interface ISuccess {
+  total: number;
+}
+
+// Интерфейс действие с карточкой в корзине
+export interface ICardBasketActions {
+  onRemove?: () => void;
+}
+
+// Интерфейс выбор карточки из каталога
+export interface ICardActions {
+  onClick?: () => void;
+}
+
+// Интерфейс предпросмотра карточки товара
+export interface ICardPreviewActions {
+  onChange?: () => void;
+}
+
+export const SYNAPSE_CURRENCY_NAME = "синапсов"; // Валюта
+
+// События
+export const EVENTS = {
+  catalog: {
+    changed: "catalog:changed",
+    select: "catalog:select",
+  },
+
+  card: {
+    remove: "card:remove",
+  },
+
+  basket: {
+    open: "basket:open",
+    checkout: "basket:checkout",
+  },
+
+  cart: {
+    changed: "cart:changed",
+    clear: "cart:clear",
+  },
+
+  order: {
+    submit: "order:submit",
+    address: "order:address",
+    payment: "order:payment",
+  },
+
+  contacts: {
+    submit: "contacts:submit",
+    email: "contacts:email",
+    phone: "contacts:phone",
+  },
+
+  buyer: {
+    paymentChanged: "buyer:payment-changed",
+    addressChanged: "buyer:address-changed",
+    emailChanged: "buyer:email-changed",
+    phoneChanged: "buyer:phone-changed",
+    dataChanged: "buyer:data-changed",
+    clear: "buyer:clear",
+  },
+
+  success: {
+    close: "success:close",
+  },
+
+  modal: {
+    close: "modal:close",
+  },
+} as const;

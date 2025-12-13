@@ -1,72 +1,84 @@
-import { IBuyer, TPayment } from '../../types/index';
+import { IBuyer } from "../../types";
+import { TPayment } from "../../types";
+import { IEvents } from "../base/Events";
+import { EVENTS } from "../../types";
 
-//Тип для ошибок валидации данных покупателя
-type TBuyerErrors = Partial<Record<keyof IBuyer, string>>;
-
-
-//Класс модели данных для хранения и валидации данных покупателя
-//Отвечает за хранение данных покупателя при оформлении заказа
+export type TBuyerErrors = Partial<Record<keyof IBuyer, string>>;
 
 export class Buyer {
-    protected payment: TPayment | null = null;
-    protected address: string = '';
-    protected email: string = '';
-    protected phone: string = '';
+  private payment: TPayment | null = null;
+  private email: string = "";
+  private phone: string = "";
+  private address: string = "";
 
-    setField<K extends keyof IBuyer>(field: K, value: IBuyer[K]): void {
-        switch (field) {
-            case 'payment':
-                this.payment = value as TPayment;
-                break;
-            case 'address':
-                this.address = value as string;
-                break;
-            case 'email':
-                this.email = value as string;
-                break;
-            case 'phone':
-                this.phone = value as string;
-                break;
-        }
+  constructor(protected events: IEvents) {}
+
+  setData(data: Partial<IBuyer>): void {
+    if (data.email !== undefined) {
+      this.email = data.email;
     }
-
-    //Получить все данные покупателя
-    getData(): Partial<IBuyer> {
-        return {
-            payment: this.payment ?? undefined,
-            address: this.address,
-            email: this.email,
-            phone: this.phone
-        };
+    if (data.phone !== undefined) {
+      this.phone = data.phone;
     }
-
-    //Очистить все данные покупателя
-    clear(): void {
-        this.payment = null;
-        this.address = '';
-        this.email = '';
-        this.phone = '';
+    if (data.address !== undefined) {
+      this.address = data.address;
     }
-
-    validate(): TBuyerErrors {
-        const errors: TBuyerErrors = {};
-
-        if (!this.payment) {
-            errors.payment = 'Не выбран вид оплаты';
-        }
-
-        if (!this.address?.trim()) {
-            errors.address = 'Укажите адрес доставки';
-        }
-
-        if (!this.email?.trim()) {
-            errors.email = 'Укажите емэйл';
-        }
-
-        if (!this.phone?.trim()) {
-            errors.phone = 'Укажите телефон';
-        }
-
-        return errors;
+    if (data.payment !== undefined) {
+      this.payment = data.payment;
     }
+    this.events.emit(EVENTS.buyer.dataChanged);
+  }
+
+  getData(): IBuyer {
+    return {
+      payment: this.payment as TPayment,
+      email: this.email,
+      phone: this.phone,
+      address: this.address,
+    };
+  }
+
+  clear(): void {
+    this.address = "";
+    this.payment = null;
+    this.email = "";
+    this.phone = "";
+  }
+
+  setPayment(payment: TPayment): void {
+    this.payment = payment;
+    this.events.emit(EVENTS.buyer.paymentChanged, { payment });
+  }
+
+  setAddress(address: string): void {
+    this.address = address;
+    this.events.emit(EVENTS.buyer.addressChanged);
+  }
+
+  setEmail(email: string): void {
+    this.email = email;
+    this.events.emit(EVENTS.buyer.emailChanged);
+  }
+
+  setPhone(phone: string): void {
+    this.phone = phone;
+    this.events.emit(EVENTS.buyer.phoneChanged);
+  }
+
+  validate(): TBuyerErrors {
+    const errors: TBuyerErrors = {};
+    if (!this.address || this.address === "") {
+      errors.address = "Не указан адрес";
+    }
+    if (!this.email || this.email === "") {
+      errors.email = "Укажите адрес электронной почты";
+    }
+    if (!this.payment) {
+      errors.payment = "Не выбран способ оплаты";
+    }
+    if (!this.phone || this.phone === "") {
+      errors.phone = "Не указан номер телефона";
+    }
+    return errors;
+  }
 }
