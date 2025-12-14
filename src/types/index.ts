@@ -99,13 +99,14 @@ export const SYNAPSE_CURRENCY_NAME = "синапсов"; // Валюта
 
 // События
 export const EVENTS = {
-  catalog: {
+ catalog: {
     changed: "catalog:changed",
-    select: "catalog:select",
+    select: "catalog:select",  // Должно быть
   },
 
   card: {
     remove: "card:remove",
+    toggle: "card:toggle",     // Должно быть
   },
 
   basket: {
